@@ -11,7 +11,7 @@
     "bin"
   ],
   "scripts": {
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/live.test.js test/static.test.js"
   },
   "engines": {
     "node": ">=18.3"
