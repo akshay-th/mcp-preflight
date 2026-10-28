@@ -1,0 +1,37 @@
+{
+  "name": "mcp-preflight",
+  "version": "0.1.0",
+  "description": "Check every MCP server config (Claude Code, Claude Desktop, Cursor, VS Code, Windsurf, Gemini CLI, Codex, OpenCode) for broken JSON, missing commands, GUI PATH problems, leaked secrets and failing handshakes.",
+  "type": "module",
+  "bin": {
+    "mcp-preflight": "./bin/cli.js"
+  },
+  "files": [
+    "src",
+    "bin"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=18.3"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "doctor",
+    "claude-code",
+    "claude-desktop",
+    "cursor",
+    "codex",
+    "gemini-cli",
+    "opencode",
+    "vscode"
+  ],
+  "author": "akshay-th",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akshay-th/mcp-preflight.git"
+  }
+}
