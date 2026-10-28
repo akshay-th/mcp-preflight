@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process';
 import { needsShell, onLines, tryParse } from './lines.js';
+import { which } from './which.js';
 
 const PROTOCOL_VERSION = '2025-06-18';
 const CLIENT_INFO = { name: 'mcp-preflight', version: '0.1.0' };
@@ -50,6 +51,11 @@ export function probeStdio(server, { timeoutMs = 20000, env = process.env, pathO
     };
     const timer = setTimeout(() => finish({ error: `no response within ${timeoutMs}ms`, code: 'timeout' }), timeoutMs);
 
+    // Through a shell (Windows .cmd shims) a missing binary is just "exit code 1"; say ENOENT like everywhere else.
+    if (needsShell(command) && !which(command, { path: childEnv.PATH || childEnv.Path || '', cwd: server.cwd })) {
+      finish({ error: `spawn ${command} ENOENT`, code: 'spawn' });
+      return;
+    }
     try {
       child = spawn(command, args, { env: childEnv, cwd: server.cwd, stdio: ['pipe', 'pipe', 'pipe'], shell: needsShell(command), windowsHide: true });
     } catch (e) {
