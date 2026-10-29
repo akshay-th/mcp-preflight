@@ -1,4 +1,5 @@
 import { existsSync, statSync } from 'node:fs';
+import { homedir } from 'node:os';
 import { guiPath, versionManagerOf, which } from './which.js';
 
 // Variable reference syntaxes clients expand, per client.
@@ -135,8 +136,13 @@ export function checkServer(server, { env = process.env, platform = process.plat
   return f;
 }
 
+// A copy-pasteable shell path: "$HOME/..." expands inside double quotes, "~/..." would not.
+function shellPath(p, home) {
+  return home && p.startsWith(`${home}/`) ? `"$HOME${p.slice(home.length)}"` : `"${p}"`;
+}
+
 /** File-level findings: parse errors, permissions on files that hold secrets. */
-export function checkFile(file, servers, { platform = process.platform } = {}) {
+export function checkFile(file, servers, { platform = process.platform, home = homedir() } = {}) {
   const f = [];
   if (file.error) {
     const at = file.error.line ? ` at line ${file.error.line}, column ${file.error.col}` : '';
@@ -146,7 +152,7 @@ export function checkFile(file, servers, { platform = process.platform } = {}) {
     try {
       const mode = statSync(file.path).mode & 0o777;
       if (mode & 0o044) {
-        f.push({ level: 'warn', code: 'readable-secrets', message: `file holds secrets but is readable by other users (mode ${mode.toString(8)})`, fix: `chmod 600 "${file.path}"` });
+        f.push({ level: 'warn', code: 'readable-secrets', message: `file holds secrets but is readable by other users (mode ${mode.toString(8)})`, fix: `chmod 600 ${shellPath(file.path, home)}` });
       }
     } catch {}
   }

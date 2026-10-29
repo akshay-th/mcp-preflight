@@ -164,6 +164,8 @@ test('file checks: parse errors and readable secrets', { skip: !unix }, () => {
   chmodSync(p, 0o644);
   const servers = [S({ env: { API_KEY: 'abcdefghijklmnop' } })];
   assert.deepEqual(codes(checkFile({ path: p }, servers)), ['readable-secrets']);
+  assert.equal(checkFile({ path: p }, servers, { home: dir })[0].fix, 'chmod 600 "$HOME/mcp.json"');
+  assert.equal(checkFile({ path: p }, servers, { home: '/elsewhere' })[0].fix, `chmod 600 "${p}"`);
   chmodSync(p, 0o600);
   assert.deepEqual(codes(checkFile({ path: p }, servers)), []);
   assert.match(checkFile({ path: p, error: { error: 'Unexpected token }', line: 3, col: 9 } }, [])[0].message, /line 3, column 9/);
